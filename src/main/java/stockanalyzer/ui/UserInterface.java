@@ -17,6 +17,7 @@ public class UserInterface
 	}
 
 	public void getDataFromCtrl2(){
+		ctrl.process("AAPL");
 	}
 
 	public void getDataFromCtrl3(){

@@ -10,11 +10,12 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class YahooFinance {
+public class YahooFinance{
 
     public static final String URL_YAHOO = "https://query1.finance.yahoo.com/v7/finance/quote?symbols=%s";
 
@@ -39,7 +40,11 @@ public class YahooFinance {
                 response.append(inputLine);
             }
             in.close();
-        } catch (IOException e) {
+        } catch (UnknownHostException e){
+            System.err.println("Hostname couldn't be resolved. Are you online?");
+        }
+        catch (IOException e) {
+
             e.printStackTrace();
         }
         return response.toString();
@@ -80,7 +85,7 @@ public class YahooFinance {
         try {
              result  = objectMapper.readValue(jsonResponse, YahooResponse.class);
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
         return result;
     }

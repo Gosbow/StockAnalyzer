@@ -1,0 +1,1 @@
+Get the Source from: https://github.com/Gosbow/StockAnalyzer.git

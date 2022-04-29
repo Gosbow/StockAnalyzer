@@ -4,20 +4,35 @@ package stockanalyzer.ui;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.sql.SQLOutput;
 
 import stockanalyzer.ctrl.Controller;
+import stockanalyzer.ctrl.YahooException;
+import stockanalyzer.ctrl.getAverageException;
 
 public class UserInterface 
 {
 
 	private Controller ctrl = new Controller();
 
-	public void getDataFromCtrl1(){
-		ctrl.process("ABC");
+	public void getDataFromCtrl1()  {
+		try {
+			ctrl.process("ABC");
+		} catch (YahooException e) {
+			System.out.println(e.getMessage());
+		} catch (getAverageException e){
+			System.out.println(e.getMessage());;
+		}
 	}
 
 	public void getDataFromCtrl2(){
-		ctrl.process("AAPL");
+		try {
+			ctrl.process("AAPL");
+		} catch (YahooException e) {
+			System.out.println(e.getMessage());
+		} catch (getAverageException e){
+			System.out.println(e.getMessage());
+		}
 	}
 
 	public void getDataFromCtrl3(){
@@ -28,7 +43,17 @@ public class UserInterface
 	}
 	
 	public void getDataForCustomInput() {
-		
+		System.out.println("Enter some Companies: ");
+		String userInput = this.readLine();
+		userInput = userInput.replace(" ",",");
+		try {
+			ctrl.process(userInput);
+
+		} catch (YahooException e) {
+			System.out.println(e.getMessage());
+		} catch (getAverageException e){
+		System.out.println(e.getMessage());
+		}
 	}
 
 

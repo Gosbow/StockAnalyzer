@@ -1,56 +1,94 @@
 package stockanalyzer.ctrl;
 
 import yahooApi.YahooFinance;
-import yahooApi.beans.Quote;
 import yahooApi.beans.QuoteResponse;
+import yahooApi.beans.Result;
 import yahooApi.beans.YahooResponse;
 
-import java.net.UnknownHostException;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 
 public class Controller {
 		
-	public void process(String ticker) {
+	public void process(String ticker) throws YahooException, getAverageException {
 		System.out.println("Start process");
 
+		//TODO implement Error handling
 
-		//TODO implement Error handling 
 
-		try{
-			QuoteResponse response = (QuoteResponse)getData(ticker);
-
-			response.getResult().stream().forEach(quote -> System.out.println(quote.getLongName() + " (" + quote.getSymbol() + ")" + ":"));
-			response.getResult().stream().forEach(quote -> System.out.println(" Current BID: " + quote.getAsk() + " " + quote.getCurrency() + " Average of the last 10 days: " + quote.getAverageDailyVolume10Day()));
+		try {
+			QuoteResponse response = (QuoteResponse) getData(ticker);
+		/*String map = response.getResult().stream().
+				map(Result::getSymbol).collect(Collectors.joining());*/
+			getAverageCourseoflastDays(response);
+			List<String> test = Arrays.asList(ticker);
+			long x = response.getResult().stream().
+					map(Result::getAsk).count();
 		}
-		catch (NullPointerException e){
-			System.err.println("Something went wrong, while fetching Data. Error:  " + e.toString());
+		catch(YahooException e){
+			throw new YahooException("Error while fetching Data.");
 		}
+
+
+		//Integer y = response.getResult().stream().
+		//		map(Result::getAsk).mapToInt();
+
+		List<Integer> val = new ArrayList<>();
+
+
+
+			//val.stream().filter(p -> response.getResult
+			//getMaxval()
+
+
 		//TODO implement methods for
 		//1) Daten laden
 		//2) Daten Analyse
 
 	}
-	
 
-	public Object getData(String searchString) {
+	public double getMaxval(List<Double> input){
 
-		List<String> searchStrings = Arrays.asList(searchString);
-		YahooFinance yahooFinance = new YahooFinance();
-		try {
-			YahooResponse response = yahooFinance.getCurrentData(searchStrings);
-			QuoteResponse quotes = response.getQuoteResponse();
-			return quotes;
-		} catch (NullPointerException e){
-			System.out.println("Couldn't get Data from " + YahooFinance.URL_YAHOO);
-			e.printStackTrace();
-		} catch (Exception e){
-			System.err.println("Something went wrong, while fetching Data. Error:  " + e.toString());
+
+		return Collections.max(input);
+	}
+
+	public void getAverageCourseoflastDays(QuoteResponse response) throws getAverageException  {
+
+		String symbol = response.getResult().stream().
+				map(Result::getSymbol).collect(Collectors.joining());
+		String getLongName = response.getResult().stream().
+				map(Result::getLongName).collect(Collectors.joining());
+
+		if(symbol.isEmpty() || symbol.isBlank() || getLongName.contains("null")){
+			throw new getAverageException("Stock Information is not available!");
+		} else {
+
+			response.getResult().stream().forEach(result -> System.out.println("\n"+result.getLongName() + " (" + result.getSymbol() + "): " + "\tAverage of the last 50 days: " + result.getFiftyDayAverage() + " " + result.getCurrency()));
 		}
 
-		return null;
+
+
 	}
+
+
+
+		public Object getData (String searchString) throws YahooException {
+
+			List<String> searchStrings = Arrays.asList(searchString);
+			YahooFinance yahooFinance = new YahooFinance();
+			try {
+				YahooResponse response = yahooFinance.getCurrentData(searchStrings);
+				QuoteResponse quotes = response.getQuoteResponse();
+				return quotes;
+			} catch (Exception e) {
+				throw new YahooException("Error while fetching Data");
+			}
+
+		//	return null;
+		}
 
 
 	public void closeConnection() {

@@ -29,6 +29,9 @@ public class YahooFinance{
             obj = new URL(query);
         } catch (MalformedURLException e) {
             e.printStackTrace();
+        } catch (Exception e)
+        {
+            System.err.println(e.getMessage());
         }
         HttpURLConnection con = null;
         StringBuilder response = new StringBuilder();
@@ -44,10 +47,7 @@ public class YahooFinance{
             throw new UnknownHostException("Hostname couldn't be resolved. Are you online?");
 
         }
-     /*   catch (IOException e) {
 
-            e.printStackTrace();
-        }*/
         return response.toString();
     }
 

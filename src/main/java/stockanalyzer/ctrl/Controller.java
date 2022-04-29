@@ -5,6 +5,7 @@ import yahooApi.beans.QuoteResponse;
 import yahooApi.beans.Result;
 import yahooApi.beans.YahooResponse;
 
+import java.net.UnknownHostException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -17,7 +18,6 @@ public class Controller {
 
 		//TODO implement Error handling
 
-
 		try {
 			QuoteResponse response = (QuoteResponse) getData(ticker);
 			long x = response.getResult().stream().
@@ -27,14 +27,12 @@ public class Controller {
 
 		}
 		catch(YahooException e){
-			throw new YahooException("Error while fetching Data.");
+			System.out.println(e.getMessage());
 		}
-
 
 		//TODO implement methods for
 		//1) Daten laden
 		//2) Daten Analyse
-
 	}
 
 	public double getMaxval(QuoteResponse response) throws YahooException {
@@ -61,18 +59,22 @@ public class Controller {
 		if(symbol.isEmpty() || symbol.isBlank() || getLongName.contains("null")){
 			throw new getAverageException("\nStock Information is not available!");
 		} else {
-			List<Double> input = new ArrayList<>();
-			double sum=0;
-			response.getResult().stream().forEach(s -> input.add(s.getRegularMarketDayHigh()));
-			for(int i=0; i<input.size();i++){
-				sum += input.get(i);
-			}
-			response.getResult().stream().forEach(result -> System.out.println("\n"+result.getLongName() + " (" + result.getSymbol() + "): Regular Market High: "+ result.getRegularMarketDayHigh() + "\tAverage of the last 50 days: " + String.format("%.2f",result.getFiftyDayAverage()) + " " + result.getCurrency()));
+			try {
+				List<Double> input = new ArrayList<>();
+				double sum = 0;
+				response.getResult().stream().forEach(s -> input.add(s.getRegularMarketDayHigh()));
+				for (int i = 0; i < input.size(); i++) {
+					sum += input.get(i);
+				}
+				response.getResult().stream().forEach(result -> System.out.println("\n" + result.getLongName() + " (" + result.getSymbol() + "): Regular Market High: " + result.getRegularMarketDayHigh() + "\tAverage of the last 50 days: " + String.format("%.2f", result.getFiftyDayAverage()) + " " + result.getCurrency()));
 
-			return sum/cnt;
+				return sum / cnt;
+			}catch (Exception e){
+				System.out.println(e.getMessage());
+			}
 		}
 
-
+	return 0;
 
 	}
 
@@ -89,7 +91,6 @@ public class Controller {
 			} catch (Exception e) {
 				throw new YahooException("Error while fetching Data");
 			}
-
 		}
 
 

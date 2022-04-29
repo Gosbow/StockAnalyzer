@@ -7,7 +7,7 @@ import yahooApi.beans.YahooResponse;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+
 
 
 public class Controller {
@@ -20,27 +20,15 @@ public class Controller {
 
 		try {
 			QuoteResponse response = (QuoteResponse) getData(ticker);
-		/*String map = response.getResult().stream().
-				map(Result::getSymbol).collect(Collectors.joining());*/
-			getAverageCourseoflastDays(response);
-			List<String> test = Arrays.asList(ticker);
 			long x = response.getResult().stream().
 					map(Result::getAsk).count();
+			System.out.println("\nRegular Market Day High from asked Stocks: " + String.format("%.2f", getMaxval(response)));
+			System.out.println("\nAverage of asked Stocks : "+ String.format("%.2f", getAverageCourseoflastDays(response,x)));
+
 		}
 		catch(YahooException e){
 			throw new YahooException("Error while fetching Data.");
 		}
-
-
-		//Integer y = response.getResult().stream().
-		//		map(Result::getAsk).mapToInt();
-
-		List<Integer> val = new ArrayList<>();
-
-
-
-			//val.stream().filter(p -> response.getResult
-			//getMaxval()
 
 
 		//TODO implement methods for
@@ -49,13 +37,21 @@ public class Controller {
 
 	}
 
-	public double getMaxval(List<Double> input){
+	public double getMaxval(QuoteResponse response) throws YahooException {
 
 
-		return Collections.max(input);
+		List<Double> input = new ArrayList<>();
+
+		try{
+			response.getResult().stream().forEach(s -> input.add(s.getRegularMarketDayHigh()));
+			return Collections.max(input);
+		}catch (Exception e){
+			throw new YahooException(e.getMessage());
+		}
+
 	}
 
-	public void getAverageCourseoflastDays(QuoteResponse response) throws getAverageException  {
+	public double getAverageCourseoflastDays(QuoteResponse response, long cnt) throws getAverageException  {
 
 		String symbol = response.getResult().stream().
 				map(Result::getSymbol).collect(Collectors.joining());
@@ -63,10 +59,17 @@ public class Controller {
 				map(Result::getLongName).collect(Collectors.joining());
 
 		if(symbol.isEmpty() || symbol.isBlank() || getLongName.contains("null")){
-			throw new getAverageException("Stock Information is not available!");
+			throw new getAverageException("\nStock Information is not available!");
 		} else {
+			List<Double> input = new ArrayList<>();
+			double sum=0;
+			response.getResult().stream().forEach(s -> input.add(s.getRegularMarketDayHigh()));
+			for(int i=0; i<input.size();i++){
+				sum += input.get(i);
+			}
+			response.getResult().stream().forEach(result -> System.out.println("\n"+result.getLongName() + " (" + result.getSymbol() + "): Regular Market High: "+ result.getRegularMarketDayHigh() + "\tAverage of the last 50 days: " + String.format("%.2f",result.getFiftyDayAverage()) + " " + result.getCurrency()));
 
-			response.getResult().stream().forEach(result -> System.out.println("\n"+result.getLongName() + " (" + result.getSymbol() + "): " + "\tAverage of the last 50 days: " + result.getFiftyDayAverage() + " " + result.getCurrency()));
+			return sum/cnt;
 		}
 
 
@@ -87,7 +90,6 @@ public class Controller {
 				throw new YahooException("Error while fetching Data");
 			}
 
-		//	return null;
 		}
 
 

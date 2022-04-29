@@ -36,17 +36,23 @@ public class UserInterface
 	}
 
 	public void getDataFromCtrl3(){
-
+		try {
+			ctrl.process("AMZN");
+		} catch (YahooException e) {
+			System.out.println(e.getMessage());
+		} catch (getAverageException e){
+			System.out.println(e.getMessage());
+		}
 	}
 	public void getDataFromCtrl4(){
 
 	}
 	
 	public void getDataForCustomInput() {
-		System.out.println("Enter some Companies: ");
-		String userInput = this.readLine();
-		userInput = userInput.replace(" ",",");
 		try {
+			System.out.println("Enter some Companies: ");
+			String userInput = this.readLine();
+			userInput = userInput.replace(" ",",");
 			ctrl.process(userInput);
 
 		} catch (YahooException e) {

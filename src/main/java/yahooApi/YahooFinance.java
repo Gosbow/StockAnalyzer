@@ -44,7 +44,7 @@ public class YahooFinance{
             }
             in.close();
         } catch (Exception e){
-            throw new UnknownHostException("Hostname couldn't be resolved. Are you online?");
+            throw new UnknownHostException("\nHostname couldn't be resolved. Files are not fetched. Make sure, your machine is connected to the Internet.");
 
         }
 
@@ -88,7 +88,7 @@ public class YahooFinance{
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         } catch (Exception e){
-            throw new UnknownHostException("Hostname couldn't be resolved. Are you online?");
+            throw new UnknownHostException(e.getMessage());
         }
         return result;
     }

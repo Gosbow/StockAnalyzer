@@ -20,10 +20,11 @@ public class Controller {
 
 		try {
 			QuoteResponse response = (QuoteResponse) getData(ticker);
-			long x = response.getResult().stream().
+			long count = response.getResult().stream().
 					map(Result::getAsk).count();
+			System.out.println("\n Number of found Data: " + getNumberofStocks(count));
 			System.out.println("\nRegular Market Day High from asked Stocks: " + String.format("%.2f", getMaxval(response)));
-			System.out.println("\nAverage of asked Stocks : "+ String.format("%.2f", getAverageCourseoflastDays(response,x)));
+			System.out.println("\nAverage of asked Stocks : "+ String.format("%.2f", getAverageCourseoflastDays(response,getNumberofStocks(count))));
 
 		}
 		catch(YahooException e){
@@ -51,32 +52,44 @@ public class Controller {
 
 	}
 
+	public long getNumberofStocks(long nr) throws YahooException {
+		if(nr == 0){
+			throw new YahooException("\nNo Data found.");
+		}else{
+			return nr;
+		}
+	}
 	public double getAverageCourseoflastDays(QuoteResponse response, long cnt) throws getAverageException  {
 
 		String symbol = response.getResult().stream().
 				map(Result::getSymbol).collect(Collectors.joining());
 		String getLongName = response.getResult().stream().
 				map(Result::getLongName).collect(Collectors.joining());
-
+		double sum = 0;
 		if(symbol.isEmpty() || symbol.isBlank() || getLongName.contains("null")){
 			throw new getAverageException("\nStock Information is not available!");
 		} else {
 			try {
 				List<Double> input = new ArrayList<>();
-				double sum = 0;
+
 				response.getResult().stream().forEach(s -> input.add(s.getRegularMarketDayHigh()));
 				for (int i = 0; i < input.size(); i++) {
 					sum += input.get(i);
 				}
 				response.getResult().stream().forEach(result -> System.out.println("\n" + result.getLongName() + " (" + result.getSymbol() + "): Regular Market High: " + result.getRegularMarketDayHigh() + "\tAverage of the last 50 days: " + String.format("%.2f", result.getFiftyDayAverage()) + " " + result.getCurrency()));
 
-				return sum / cnt;
+				if(cnt == 0){
+					throw new ArithmeticException("Problem with the Calculation");
+				}else {
+					return sum / cnt;
+				}
 			}catch (Exception e){
 				System.err.println(e.getMessage());
 			}
+			return 0;
 		}
 
-	return 0;
+	//return 0;
 
 	}
 
@@ -91,10 +104,11 @@ public class Controller {
 				QuoteResponse quotes = response.getQuoteResponse();
 				return quotes;
 			}catch (UnknownHostException e){
-				throw new UnknownHostException("\nCan not resolve Hostname to fetch.");
+				throw new UnknownHostException(e.getMessage());
 			}catch (Exception e) {
 				throw new YahooException("\nError while fetching Data");
 			}
+
 		}
 
 

@@ -27,7 +27,9 @@ public class Controller {
 
 		}
 		catch(YahooException e){
-			System.out.println(e.getMessage());
+			System.err.println(e.getMessage());
+		}catch (Exception e){
+			System.err.println(e.getMessage());
 		}
 
 		//TODO implement methods for
@@ -70,7 +72,7 @@ public class Controller {
 
 				return sum / cnt;
 			}catch (Exception e){
-				System.out.println(e.getMessage());
+				System.err.println(e.getMessage());
 			}
 		}
 
@@ -80,7 +82,7 @@ public class Controller {
 
 
 
-		public Object getData (String searchString) throws YahooException {
+		public Object getData (String searchString) throws YahooException, UnknownHostException {
 
 			List<String> searchStrings = Arrays.asList(searchString);
 			YahooFinance yahooFinance = new YahooFinance();
@@ -88,8 +90,10 @@ public class Controller {
 				YahooResponse response = yahooFinance.getCurrentData(searchStrings);
 				QuoteResponse quotes = response.getQuoteResponse();
 				return quotes;
-			} catch (Exception e) {
-				throw new YahooException("Error while fetching Data");
+			}catch (UnknownHostException e){
+				throw new UnknownHostException("\nCan not resolve Hostname to fetch.");
+			}catch (Exception e) {
+				throw new YahooException("\nError while fetching Data");
 			}
 		}
 

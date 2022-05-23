@@ -1,5 +1,7 @@
 package stockanalyzer.ctrl;
 
+import stockanalyzer.downloader.ParallelDownloader;
+import stockanalyzer.downloader.SequentialDownloader;
 import yahooApi.YahooFinance;
 import yahooApi.beans.QuoteResponse;
 import yahooApi.beans.Result;
@@ -111,6 +113,15 @@ public class Controller {
 
 		}
 
+		public void downloadTickers(){
+		List<String> seqList = Arrays.asList("AAPL", "MSFT", "ABC");
+			List<String> paraList = Arrays.asList("MAN", "TWTR", "FB", "GOOG");
+
+			SequentialDownloader test = new SequentialDownloader();
+			test.process(seqList);
+			ParallelDownloader parallel = new ParallelDownloader();
+			parallel.process(paraList);
+		}
 
 	public void closeConnection() {
 		

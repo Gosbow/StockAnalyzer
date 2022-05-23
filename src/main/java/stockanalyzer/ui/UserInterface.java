@@ -61,6 +61,9 @@ public class UserInterface
 		System.out.println(e.getMessage());
 		}
 	}
+	public void downloadTickers(){
+		ctrl.downloadTickers();
+	}
 
 
 	public void start() {
@@ -70,6 +73,7 @@ public class UserInterface
 		menu.insert("b", "Choice 2", this::getDataFromCtrl2);
 		menu.insert("c", "Choice 3", this::getDataFromCtrl3);
 		menu.insert("d", "Choice User Imput:",this::getDataForCustomInput);
+		menu.insert("e", "Download Tickers:", this::downloadTickers);
 		menu.insert("z", "Choice User Imput:",this::getDataFromCtrl4);
 		menu.insert("q", "Quit", null);
 		Runnable choice;

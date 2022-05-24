@@ -6,7 +6,10 @@ import yahooApi.YahooFinance;
 import yahooApi.beans.QuoteResponse;
 import yahooApi.beans.Result;
 import yahooApi.beans.YahooResponse;
+import yahoofinance.Stock;
 
+import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.UnknownHostException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -24,6 +27,7 @@ public class Controller {
 			QuoteResponse response = (QuoteResponse) getData(ticker);
 			long count = response.getResult().stream().
 					map(Result::getAsk).count();
+			System.out.println("\nGet the Historical Average: " + getlogHistoricalQuotes(response));
 			System.out.println("\n Number of found Data: " + getNumberofStocks(count));
 			System.out.println("\nRegular Market Day High from asked Stocks: " + String.format("%.2f", getMaxval(response)));
 			System.out.println("\nAverage of asked Stocks : "+ String.format("%.2f", getAverageCourseoflastDays(response,getNumberofStocks(count))));
@@ -54,6 +58,49 @@ public class Controller {
 
 	}
 
+	public float getlogHistoricalQuotes(QuoteResponse response) throws YahooException, getAverageException {
+		Stock stock = null;
+		float result = 0;
+
+		String ticker = response.getResult().stream().
+				map(Result::getSymbol).collect(Collectors.joining());;
+		try {
+			long count = 0;
+
+			List<BigDecimal> adjValue = new ArrayList<>();
+			List<Calendar> calendar = new ArrayList<>();
+			stock = yahoofinance.YahooFinance.get(ticker);
+
+		//	stock.getHistory().forEach(System.out::println);
+			stock.getHistory().stream().forEach(s -> calendar.add(s.getDate()));
+			count = stock.getHistory().stream().count();
+			stock.getHistory().stream().forEach(s -> adjValue.add(s.getAdjClose()));
+		//	System.out.println("Shows the Average of the Dates: ");
+			for(int i = 0; i < count;i++){
+
+				result += adjValue.listIterator(i).next().floatValue();
+		//		System.out.print(" " + calendar.get(i).getTime());
+			}
+			result /= count;
+		} catch (ArithmeticException e){
+			throw new getAverageException(e.getMessage());
+		}
+		catch (Exception e) {
+			throw new YahooException(e.getMessage());
+		}
+		return result;
+	}
+	public String getSymbol(QuoteResponse response) throws YahooException {
+		String symbol = null;
+		try {
+			symbol = response.getResult().stream().
+					map(Result::getSymbol).collect(Collectors.joining());
+			return symbol;
+		}catch (Exception e){
+			throw new YahooException(e.getMessage());
+		}
+
+	}
 	public long getNumberofStocks(long nr) throws YahooException {
 		if(nr == 0){
 			throw new YahooException("\nNo Data found.");
@@ -61,7 +108,7 @@ public class Controller {
 			return nr;
 		}
 	}
-	public double getAverageCourseoflastDays(QuoteResponse response, long cnt) throws getAverageException  {
+	public double getAverageCourseoflastDays(QuoteResponse response, long cnt) throws getAverageException {
 
 		String symbol = response.getResult().stream().
 				map(Result::getSymbol).collect(Collectors.joining());

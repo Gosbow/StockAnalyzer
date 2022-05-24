@@ -69,10 +69,10 @@ public class UserInterface
 	public void start() {
 		Menu<Runnable> menu = new Menu<>("User Interfacx");
 		menu.setTitel("Wählen Sie aus:");
-		menu.insert("a", "Choice 1", this::getDataFromCtrl1);
-		menu.insert("b", "Choice 2", this::getDataFromCtrl2);
-		menu.insert("c", "Choice 3", this::getDataFromCtrl3);
-		menu.insert("d", "Choice User Imput:",this::getDataForCustomInput);
+		menu.insert("a", "Choice 1: ABC(\"ABC\")", this::getDataFromCtrl1);
+		menu.insert("b", "Choice 2: Apple(\"AAPL\")", this::getDataFromCtrl2);
+		menu.insert("c", "Choice 3: Amazon(\"AMZN\")", this::getDataFromCtrl3);
+		menu.insert("d", "Choice User Imput  (More than One Value):",this::getDataForCustomInput);
 		menu.insert("e", "Download Tickers:", this::downloadTickers);
 		menu.insert("z", "Choice User Imput:",this::getDataFromCtrl4);
 		menu.insert("q", "Quit", null);

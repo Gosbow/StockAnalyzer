@@ -1,17 +1,14 @@
 package stockanalyzer.downloader;
 
-import org.w3c.dom.ls.LSOutput;
-import stockanalyzer.ctrl.YahooException;
 
 import java.io.FileNotFoundException;
 import java.util.List;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 
 public class ParallelDownloader extends Downloader {
-
+    Future task;
+    long starttime = System.nanoTime();
 
     @Override
     public int process(List<String> tickers){
@@ -19,12 +16,21 @@ public class ParallelDownloader extends Downloader {
         ExecutorService executor = Executors.newCachedThreadPool();
         for(String ticker : tickers){
             try{
-                Future<?> task = executor.submit(()->saveJson2File(ticker));
+                 task = executor.submit(()->saveJson2File(ticker));
             } catch (Exception e){
                 //throw YahooException("Fehler");
             }
         }
+        try{
+            task.get();
+        }catch (InterruptedException | ExecutionException e){
+
+        } catch (Exception e){
+            System.out.println("Fehler beim Downloaden, zu langee");
+        }
       //  Executors Executor = new ExecutorService(saveJson2File("ABC"));
-    return 0;
+        long endtime = System.nanoTime() - starttime;
+        System.out.println("Time for Paralleling Thing: "+ endtime/1000 + " ms.");
+        return 0;
     }
 }

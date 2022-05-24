@@ -11,6 +11,7 @@ import yahoofinance.Stock;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.UnknownHostException;
+import java.sql.SQLOutput;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -160,14 +161,26 @@ public class Controller {
 
 		}
 
-		public void downloadTickers(){
-		List<String> seqList = Arrays.asList("AAPL", "MSFT", "ABC");
-			List<String> paraList = Arrays.asList("MAN", "TWTR", "FB", "GOOG");
+		public void downloadTickers() throws InterruptedException {
+		List<String> StockList = Arrays.asList("AAPL", "MSFT", "ABC", "MAN", "TWTR", "FB", "GOOG");
+		/*List<String> seqList = Arrays.asList("AAPL", "MSFT", "ABC");
+			List<String> paraList = Arrays.asList("MAN", "TWTR", "FB", "GOOG");*/
 
-			SequentialDownloader test = new SequentialDownloader();
-			test.process(seqList);
+			long sequentialstartTime = System.nanoTime();
+			SequentialDownloader seqDownload = new SequentialDownloader();
+			seqDownload.process(StockList);
+			long seqendtime = (System.nanoTime() -sequentialstartTime)/1000;
+			System.out.println("Time of Sequencial Downloading: " + seqendtime + " ms.");
+			Thread.sleep(20000);
 			ParallelDownloader parallel = new ParallelDownloader();
-			parallel.process(paraList);
+			int paratime = parallel.process(StockList);
+			System.out.println("Time Difference between Sequential and Parallel Download: " + (seqendtime-paratime));
+			if(paratime < (int)seqendtime){
+				System.out.println("Parallel is faster.");
+			}else
+			{
+				System.out.println("Sequential is faster");
+			}
 		}
 
 	public void closeConnection() {

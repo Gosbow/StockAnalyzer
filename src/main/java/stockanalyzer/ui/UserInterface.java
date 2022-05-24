@@ -62,7 +62,11 @@ public class UserInterface
 		}
 	}
 	public void downloadTickers(){
-		ctrl.downloadTickers();
+		try {
+			ctrl.downloadTickers();
+		}catch (Exception e){
+			System.out.println(e.getMessage());
+		}
 	}
 
 

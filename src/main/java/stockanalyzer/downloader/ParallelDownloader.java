@@ -10,7 +10,7 @@ import java.util.concurrent.*;
 
 public class ParallelDownloader extends Downloader {
     List<Future> futureList = new ArrayList<>();
-    Future task;
+    Future<?> task;
     long starttime = System.nanoTime();
 
     @Override
@@ -35,7 +35,7 @@ public class ParallelDownloader extends Downloader {
         }
       //  Executors Executor = new ExecutorService(saveJson2File("ABC"));
         long endtime = System.nanoTime() - starttime;
-        System.out.println("Time for Paralleling Thing: "+ endtime/1000 + " ms.");
+        System.out.println("Time of Parallel Download: "+ endtime/1000 + " ms.");
 
         return ((int)endtime/1000);
     }

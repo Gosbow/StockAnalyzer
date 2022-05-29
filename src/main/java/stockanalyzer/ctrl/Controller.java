@@ -8,10 +8,8 @@ import yahooApi.beans.Result;
 import yahooApi.beans.YahooResponse;
 import yahoofinance.Stock;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.UnknownHostException;
-import java.sql.SQLOutput;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -28,15 +26,16 @@ public class Controller {
 			QuoteResponse response = (QuoteResponse) getData(ticker);
 			long count = response.getResult().stream().
 					map(Result::getAsk).count();
-			System.out.println("\nGet the Historical Average: " + getlogHistoricalQuotes(response));
-			System.out.println("\n Number of found Data: " + getNumberofStocks(count));
-			System.out.println("\nRegular Market Day High from asked Stocks: " + String.format("%.2f", getMaxval(response)));
-			System.out.println("\nAverage of asked Stocks : "+ String.format("%.2f", getAverageCourseoflastDays(response,getNumberofStocks(count))));
+			if(!ticker.contains(",")) {
+				System.out.println("\nGet the Historical Average: " + getlogHistoricalQuotes(ticker));
+			}
+			System.out.println("\n Number of Data: " + getNumberofStocks(count));
+
+				System.out.println("\nRegular Market Day High from asked Stocks: " + String.format("%.2f", getMaxval(response)));
+				System.out.println("\nAverage of asked Stocks : " + String.format("%.2f", getAverageCourseoflastDays(response, getNumberofStocks(count))));
 
 		}
-		catch(YahooException e){
-			System.err.println(e.getMessage());
-		}catch (Exception e){
+		catch(YahooException | Exception | getAverageException e){
 			System.err.println(e.getMessage());
 		}
 
@@ -53,25 +52,30 @@ public class Controller {
 		try{
 			response.getResult().stream().forEach(s -> input.add(s.getRegularMarketDayHigh()));
 			return Collections.max(input);
-		}catch (Exception e){
+		}catch (NullPointerException e){
+			throw new YahooException("Stock not found.");
+		}
+		catch (Exception e){
 			throw new YahooException(e.getMessage());
 		}
 
 	}
 
-	public float getlogHistoricalQuotes(QuoteResponse response) throws YahooException, getAverageException {
+	public float getlogHistoricalQuotes(String ticker) throws YahooException, getAverageException {
+		List<String> tickerList = Arrays.asList(ticker);
 		Stock stock = null;
 		float result = 0;
 
-		String ticker = response.getResult().stream().
-				map(Result::getSymbol).collect(Collectors.joining());;
+		/*String ticker = response.getResult().stream().
+				map(Result::getSymbol).collect(Collectors.joining());*/
 		try {
-			long count = 0;
+			long count;
 
 			List<BigDecimal> adjValue = new ArrayList<>();
 			List<Calendar> calendar = new ArrayList<>();
-			stock = yahoofinance.YahooFinance.get(ticker);
-
+			for(int i = 0; i < tickerList.size(); i++) {
+				stock = yahoofinance.YahooFinance.get(tickerList.get(i));
+			}
 		//	stock.getHistory().forEach(System.out::println);
 			stock.getHistory().stream().forEach(s -> calendar.add(s.getDate()));
 			count = stock.getHistory().stream().count();
@@ -85,6 +89,8 @@ public class Controller {
 			result /= count;
 		} catch (ArithmeticException e){
 			throw new getAverageException(e.getMessage());
+		}catch (NullPointerException e){
+			throw new YahooException("Error while fetching data.");
 		}
 		catch (Exception e) {
 			throw new YahooException(e.getMessage());
@@ -161,12 +167,14 @@ public class Controller {
 
 		}
 
-		public void downloadTickers() throws InterruptedException {
-		List<String> StockList = Arrays.asList("AAPL", "MSFT", "ABC", "MAN", "TWTR", "FB", "GOOG");
-		/*List<String> seqList = Arrays.asList("AAPL", "MSFT", "ABC");*/
-		//	List<String> paraList = Arrays.asList("MAN", "SVNDY", "WMT", "OMV");
+		public void downloadTickers() throws YahooException, Exception {
 
-			long sequentialstartTime = System.nanoTime();
+			try{
+				List<String> StockList = Arrays.asList("AAPL", "MSFT", "ABC", "MAN", "TWTR", "FB", "GOOG");
+				/*List<String> seqList = Arrays.asList("AAPL", "MSFT", "ABC");*/
+				//	List<String> paraList = Arrays.asList("MAN", "SVNDY", "WMT", "OMV");
+
+				long sequentialstartTime = System.nanoTime();
 			SequentialDownloader seqDownload = new SequentialDownloader();
 			seqDownload.process(StockList);
 			long seqendtime = (System.nanoTime() -sequentialstartTime)/1000;
@@ -179,6 +187,9 @@ public class Controller {
 			}else
 			{
 				System.out.println("Sequential is faster");
+			}
+		}catch (Exception e){
+			throw new YahooException("Error while doing the downloadTicker");
 			}
 		}
 

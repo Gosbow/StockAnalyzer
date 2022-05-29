@@ -59,13 +59,18 @@ public class UserInterface
 			System.out.println(e.getMessage());
 		} catch (getAverageException e){
 		System.out.println(e.getMessage());
+		}catch(Exception e){
+			System.err.println("Some Error occured");
 		}
 	}
 	public void downloadTickers(){
 		try {
 			ctrl.downloadTickers();
-		}catch (Exception e){
+		}catch (YahooException e){
 			System.out.println(e.getMessage());
+		}
+		catch (Exception e){
+			System.out.println("Some Error occured");
 		}
 	}
 

@@ -27,7 +27,7 @@ public class Controller {
 			long count = response.getResult().stream().
 					map(Result::getAsk).count();
 			if(!ticker.contains(",")) {
-				System.out.println("\nGet the Historical Average: " + getlogHistoricalQuotes(ticker));
+				System.out.println("\nGet the Historical Average: " + String.format("%.2f",getlogHistoricalQuotes(ticker)));
 			}
 			System.out.println("\n Number of Data: " + getNumberofStocks(count));
 
